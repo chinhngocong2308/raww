@@ -1,0 +1,26 @@
+    <?php
+    $product = $block->getProduct();
+    $p = $product->getResource()->getAttribute('raww_new');
+    $p = $p->getFrontend()->getValue($product);
+    if ($p) {
+        if (strtolower($p) == 'new') { ?>
+            <div class="raww-new">
+                <span>
+                    <?php echo $p ?>
+                </span>
+            </div>
+        <?php } elseif (strtolower($p) == 'new shade') { ?>
+            <div class="raww-newshade">
+                <span>
+                    <?php echo $p ?>
+                </span>
+            </div>
+        <?php }
+    } else { ?>
+        <div class="not-rawnew">
+            <span>
+                <?php echo '' ?>
+            </span>
+        </div>
+    <?php }
+    ?>

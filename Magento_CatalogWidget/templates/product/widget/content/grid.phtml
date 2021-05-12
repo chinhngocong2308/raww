@@ -1,0 +1,172 @@
+<?php
+
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+use Magento\Framework\App\Action\Action;
+
+/** @var \Magento\CatalogWidget\Block\Product\ProductsList $block */
+?>
+<?php if ($exist = ($block->getProductCollection() && $block->getProductCollection()->getSize())) : ?>
+    <?php
+    $type = 'widget-product-grid';
+
+    $mode = 'grid';
+
+    $image = 'new_products_content_widget_grid';
+    $items = $block->getProductCollection()->getItems();
+
+    $showWishlist = true;
+    $showCompare = true;
+    $showCart = true;
+    $templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+    $description = false;
+    ?>
+    <div class="block widget block-products-list <?= /* @noEscape */ $mode ?>">
+        <?php if ($block->getTitle()) : ?>
+            <div class="block-title">
+                <div class="favourites btn-prev">prev</div>
+                <strong><?= $block->escapeHtml(__($block->getTitle())) ?></strong>
+                <div class="favourites btn-next">next</div>
+            </div>
+        <?php endif ?>
+        <div class="block-content">
+            <?= /* @noEscape */ '<!-- ' . $image . '-->' ?>
+            <div class="products-<?= /* @noEscape */ $mode ?> <?= /* @noEscape */ $mode ?>">
+                <ol class="product-items <?= /* @noEscape */ $type ?>">
+                    <?php $iterator = 1; ?>
+                    <?php foreach ($items as $_item) : ?>
+                        <?= /* @noEscape */ ($iterator++ == 1) ? '<li class="product-item">' : '</li><li class="product-item">' ?>
+                        <div class="product-item-info">
+                            <a href="<?= $block->escapeUrl($block->getProductUrl($_item)) ?>" class="product-item-photo">
+                                <?= $block->getImage($_item, $image)->toHtml() ?>
+                            </a>
+                            <div class="product-item-details">
+                                <strong class="product-item-name">
+                                    <a title="<?= $block->escapeHtml($_item->getName()) ?>" href="<?= $block->escapeUrl($block->getProductUrl($_item)) ?>" class="product-item-link">
+                                        <?= $block->escapeHtml($_item->getName()) ?>
+                                    </a>
+                                </strong>
+
+                                <?= $block->getProductPriceHtml($_item, $type) ?>
+
+                                <?= $block->getProductDetailsHtml($_item) ?>
+
+                                <?php if ($showWishlist || $showCompare || $showCart) : ?>
+                                    <div class="product-item-inner">
+                                        <div class="product-item-actions">
+                                            <?php if ($showCart) : ?>
+                                                <div class="actions-primary">
+                                                    <?php if ($_item->isSaleable()) : ?>
+                                                        <?php $postParams = $block->getAddToCartPostParams($_item); ?>
+                                                        <form data-role="tocart-form" data-product-sku="<?= $block->escapeHtml($_item->getSku()) ?>" action="<?= $block->escapeUrl($postParams['action']) ?>" method="post">
+                                                            <input type="hidden" name="product" value="<?= $block->escapeHtmlAttr($postParams['data']['product']) ?>">
+                                                            <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED ?>" value="<?= /* @noEscape */ $postParams['data'][Action::PARAM_NAME_URL_ENCODED] ?>">
+                                                            <?= $block->getBlockHtml('formkey') ?>
+                                                            <div class="fieldset">
+                                                                <div class="field qty">
+                                                                    <div class="control">
+                                                                        <span class="minus-btn qty-btn"></span>
+                                                                        <input type="number" name="qty" id="qty" min="0" value="1" class="input-text qty" data-validate="<?= $block->escapeHtml(json_encode($block->getQuantityValidators())) ?>" />
+                                                                        <span class="plus-btn qty-btn"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <button type="submit" title="<?= $block->escapeHtml(__('Add to Bag')) ?>" class="action tocart primary">
+                                                                <span><?= $block->escapeHtml(__('Add to Bag')) ?></span>
+                                                            </button>
+                                                        </form>
+                                                    <?php else : ?>
+                                                        <?php if ($_item->getIsSalable()) : ?>
+                                                            <div class="stock available"><span><?= $block->escapeHtml(__('In stock')) ?></span></div>
+                                                        <?php else : ?>
+                                                            <div class="stock unavailable"><span><?= $block->escapeHtml(__('Out of stock')) ?></span></div>
+                                                        <?php endif; ?>
+                                                    <?php endif; ?>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <?= ($iterator == count($items) + 1) ? '</li>' : '' ?>
+                    <?php endforeach ?>
+                </ol>
+            </div>
+            <?= $block->getPagerHtml() ?>
+        </div>
+    </div>
+<?php endif; ?>
+<script>
+    // Slick product grid
+    require([
+        'jquery',
+        'slick'
+    ], function($) {
+        jQuery(document).ready(function() {
+            jQuery(".product-items").not('.slick-initialized').slick({
+                dots: false,
+                infinite: false,
+                slidesToShow: 3,
+                slidesToScroll: 3,
+                prevArrow: $('.btn-prev'),
+                nextArrow: $('.btn-next'),
+                speed: 300,
+                rows: 1,
+                responsive: [{
+                        breakpoint: 1074,
+                        settings: {
+                            slidesToShow: 2,
+                            slidesToScroll: 2
+                        }
+                    },
+                    {
+                        breakpoint: 630,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1
+                        }
+                    },
+                ]
+            });
+        });
+    });
+</script>
+<script>
+    // Slick product grid
+    require([
+        'jquery',
+        'slick'
+    ], function($) {
+        jQuery(document).ready(function() {
+            jQuery(".foursixty").not('.slick-initialized').slick({
+                dots: false,
+                infinite: false,
+                slidesToShow: 4,
+                slidesToScroll: 4,
+                prevArrow: $('.btn-prev'),
+                nextArrow: $('.btn-next'),
+                speed: 300,
+                rows: 2,
+                responsive: [{
+                        breakpoint: 1074,
+                        settings: {
+                            slidesToShow: 3,
+                            slidesToScroll: 3
+                        }
+                    },
+                    {
+                        breakpoint: 630,
+                        settings: {
+                            slidesToShow: 2,
+                            slidesToScroll: 2
+                        }
+                    },
+                ]
+            });
+        });
+    });
+</script>
